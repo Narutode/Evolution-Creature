@@ -23,7 +23,7 @@ public class NeuralNetwork : MonoBehaviour
     double[,] weightIH = new double[inputLayer, hiddenLayer];           // Definition of Weight matrix [Input - Hidden]
     double[,] weightHO = new double[hiddenLayer, outputLayer];          // Definition of Weight matrix [Hidden - Output]
 
-    double[,] biasHidden = new double[hiddenLayer, 1];            // Definition of Bias matrix [Input - Hidden] ( BIAS : int, when this node will be fully active)
+    double[,] biasHidden = new double[hiddenLayer, 1];            // Definition of Bias matrix [Input - Hidden] ( BIAS : double, when this node will be fully active)
     double[,] biasOutput = new double[outputLayer, 1];            // Definition of Bias matrix [Hidden - Output]
 
     double error;
@@ -68,30 +68,41 @@ public class NeuralNetwork : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Train();   
+        }
+           
     }
 
 
     void Train()
     {
+
+        inputNodes[0, 0] = -1;
+        inputNodes[1, 0] = 1;
+
+        desiredOutputs[0, 0] = -1;
+        desiredOutputs[1, 0] = 1;
+        
         FeedForward();
         BackPropagation();
     }
 
-    void Predict()
-    {
-
-    }
+   
 
     void FeedForward() // CALCULATE HIDDEN AND OUTPUT NODES WITH DOT PRODUCT 
     {
+        Debug.Log("FEEDFORWARD");
         hiddenNodes = Sigmoid(Add(DotProduct(Transpose(weightIH), inputNodes), biasHidden));
         outputNodes = Sigmoid(Add(DotProduct(Transpose(weightHO), hiddenNodes), biasOutput));
         actualOutputs = outputNodes;
+        
     }
 
     void BackPropagation()
     {
+        Debug.Log("BACKPROPAGATION");
         for (int i = 0; i < outputLayer; i++)
         {
             double globalError = DerivSigm(outputNodes[i, 0]) * (desiredOutputs[i, 0] - actualOutputs[i,0]);
@@ -129,6 +140,8 @@ public class NeuralNetwork : MonoBehaviour
 
     }
 
+    // FONCTIONS UTILITAIRES
+
     private double[,] DotProduct(double[,] m1, double[,] m2)  // DOT PRODUCT 
     {
         int rowsA = m1.GetLength(0);
@@ -160,11 +173,17 @@ public class NeuralNetwork : MonoBehaviour
     private double[,] Transpose(double[,] m1)           // TRANSPOSE OVER DIAGONAL
     {
         double[,] temp = new double[m1.GetLength(1), m1.GetLength(0)];
-        for(int i = 0; i < m1.GetLength(0); i++)
+        Debug.Log(m1.GetLength(1));
+        Debug.Log(m1.GetLength(0));
+        Debug.Log(temp.GetLength(1));
+        Debug.Log(temp.GetLength(0));
+
+
+        for (int i = 0; i < m1.GetLength(0) ; i++)
         {
-           for(int j = 0; j < m1.GetLength(1); j++)
+           for(int j = 0; j < m1.GetLength(1) ; j++)
             {
-                temp[i, j] = m1[i, j];
+                temp[j, i] = m1[i, j];
             }        
         }
         return temp;
@@ -194,7 +213,7 @@ public class NeuralNetwork : MonoBehaviour
         return x * (1 - x);
     }
 
-    private double[,] Sigmoid(double[,] m)             // NORMALIZE <0 - 1>
+    private double[,] Sigmoid(double[,] m)             // NORMALIZE <0 - 1> Activation Function
     {
         for (int i = 0; i < m.GetLength(0); i++)
         {

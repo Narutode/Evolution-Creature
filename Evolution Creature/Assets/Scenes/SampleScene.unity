@@ -355,7 +355,6 @@ GameObject:
   - component: {fileID: 1736773380}
   - component: {fileID: 1736773381}
   - component: {fileID: 1736773383}
-  - component: {fileID: 1736773382}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -391,28 +390,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   learningRate: 0.5
---- !u!114 &1736773382
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1736773378}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6828098972a8a1949b51818b850230e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  floorObject: {fileID: 0}
-  carnivorous: {fileID: 0}
-  herbivorous: {fileID: 0}
-  vegetables: {fileID: 0}
-  carnNum: 0
-  herbNum: 0
-  vegNum: 0
-  carnTab: []
-  herbTab: []
-  vegTab: []
 --- !u!114 &1736773383
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -513,6 +490,14 @@ PrefabInstance:
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 5141692736402354246, guid: 930d5ec0849cbe248b40f446970790ed, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5141692736402354246, guid: 930d5ec0849cbe248b40f446970790ed, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 5141692736402354246, guid: 930d5ec0849cbe248b40f446970790ed, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -609,7 +594,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7504750281981952304, guid: fe39da4fe1b3e1f43bf60a7ae6cd4f30, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: fe39da4fe1b3e1f43bf60a7ae6cd4f30, type: 3}
 --- !u!4 &6551258878617415572 stripped
 Transform:
