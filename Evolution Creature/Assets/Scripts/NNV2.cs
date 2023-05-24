@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,18 +7,55 @@ using UnityEngine;
 public class NNV2 : MonoBehaviour
 {
     // Node numbers
-    public int ni, nh, no;
+    public int ni = 4;
+    public int nh = 4;
+    public int no = 2;
+
 
     // Activation for nodes
     public double[] ai, ah, ao;
 
     // Weights
-    double[,] wi,wo;
+    double[,] wi, wo;
 
     double[,] ci, co;
 
+    double[][][] testPatterns = new double[4][][];
+
     private void Awake()
     {
+        testPatterns = new double[4][][];
+
+        testPatterns[0] = new double[][]
+        {
+            new double[] { 0, 0, 1, 1 },
+            new double[] { 0, 0 }
+        };
+
+        testPatterns[1] = new double[][]
+        {
+            new double[] { 0, 1, 0, 0 },
+            new double[] { 1, 0 }
+        };
+
+        testPatterns[2] = new double[][]
+        {
+            new double[] { 1, 0, 1, 0 },
+            new double[] { 1, 1 }
+        };
+
+        testPatterns[3] = new double[][]
+        {
+            new double[] { 1, 1, 0, 1 },
+            new double[] { 0, 1 }
+        };
+
+
+        //  {
+        //      {{a, b}, {c, d}},
+        //      {{a, b}, {c, d}}
+        //  }
+
         ni += 1; // +1 for bias node
 
         // Activation for nodes
@@ -25,9 +63,9 @@ public class NNV2 : MonoBehaviour
         ah = new double[nh];
         ao = new double[no];
 
-        for(int i = 0; i < ni; i++)
-        {      
-            ai[i] = 1.0;      
+        for (int i = 0; i < ni; i++)
+        {
+            ai[i] = 1.0;
         }
         for (int i = 0; i < nh; i++)
         {
@@ -47,7 +85,7 @@ public class NNV2 : MonoBehaviour
         {
             for (int j = 0; j < nh; j++)
             {
-                wi[i, j] = Random.Range(-2, 2);
+                wi[i, j] = UnityEngine.Random.Range(-2, 2);
             }
         }
 
@@ -55,19 +93,19 @@ public class NNV2 : MonoBehaviour
         {
             for (int j = 0; j < no; j++)
             {
-                wo[i, j] = Random.Range(-2, 2);
+                wo[i, j] = UnityEngine.Random.Range(-2, 2);
             }
         }
 
         // last change in weights for momentum
-         ci = new double[ni, nh];
-         co = new double[nh, no];
+        ci = new double[ni, nh];
+        co = new double[nh, no];
     }
 
     double[] Updating(double[] inputs)
     {
         // input activations
-        for(int i = 0; i < ni-1; i++)
+        for (int i = 0; i < ni - 1; i++)
         {
             //ai[i] = Sigmoid(inputs[i]);
             ai[i] = inputs[i];
@@ -88,9 +126,9 @@ public class NNV2 : MonoBehaviour
         for (int i = 0; i < no; i++)
         {
             double sum = 0.0;
-            for (int j = 0; i < nh; j++)
+            for (int j = 0; j < nh; j++)
             {
-               sum += ah[j] * wo[j, i];
+                sum += ah[j] * wo[j, i];
 
             }
             ao[i] = Sigmoid(sum);
@@ -101,12 +139,12 @@ public class NNV2 : MonoBehaviour
         return res;
     }
 
-    double BackPropagate(double[] targets, int N, int M)
+    double BackPropagate(double[] targets, double N, double M)
     {
         double error;
 
         // calculate error terms for output
-        double[] output_deltas = new double[no];   
+        double[] output_deltas = new double[no];
         for (int i = 0; i < no; i++)
         {
             output_deltas[i] = 0.0;
@@ -121,7 +159,7 @@ public class NNV2 : MonoBehaviour
             error = 0.0;
             for (int j = 0; j < no; j++)
             {
-                error += output_deltas[j] * wo[i,j];   
+                error += output_deltas[j] * wo[i, j];
             }
             hidden_deltas[i] = DSigmoid(ah[i]) * error;
         }
@@ -135,7 +173,7 @@ public class NNV2 : MonoBehaviour
                 wo[i, j] += N * change + M * co[i, j];
                 co[i, j] = change;
             }
-           
+
         }
 
         // update input weights
@@ -162,24 +200,79 @@ public class NNV2 : MonoBehaviour
     }
 
 
-    void Test(double[] patterns)
+    void Test(double[][][] patterns)
     {
-        foreach (var p in patterns)
+        for (int i = 0; i < patterns.Length; i++)
         {
-            Debug.Log(p[0] + "->" + Updating(p[0]));
+            for (int j = 0; j < patterns[i].Length; j++)
+            {
+                Debug.Log(patterns[i][0][j] + "->" + Updating(patterns[i][0])[j]);
+            }
+
+        }
+
+    }
+    public void Use(double[] inputs)
+    {
+
+
+    }
+
+
+    void PrintWeights()
+    {
+        Debug.Log("Input weights:");
+        for (int i = 0; i < ni; i++)
+        {
+            for (int j = 0; j < nh; j++)
+            {
+                Debug.Log(wi[i, j]);
+            }
+
         }
     }
+
+    void Train(double[][][] patterns, int iterations = 1000, double N = 0.5, double M = 0.1)
+    {
+        // N : learning rate, M : momentum factor
+
+        for (int i = 0; i < iterations; i++)
+        {
+            double error = 0.0;
+            for (int j = 0; j < patterns.Length; j++)
+            {
+
+                double[] inputs = patterns[j][0];
+                double[] targets = patterns[j][1];
+                Updating(inputs);
+                error += BackPropagate(targets, N, M);
+
+            }
+            if (i % 100 == 0)
+            {
+                Debug.Log($"error {error,-14}");
+            }
+        }
+    }
+
+    public void Demo()
+    {
+        Train(testPatterns);
+        Test(testPatterns);
+    }
+
+
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        // input activations
+        if (Input.GetKeyDown(KeyCode.Space)) Demo();
     }
 
     private double Sigmoid(double x)
@@ -192,7 +285,7 @@ public class NNV2 : MonoBehaviour
         return x * (1 - x);
     }
 
-    private double[,] Sigmoid(double[,] m)             // NORMALIZE <0 - 1> Activation Function
+    /*private double[,] Sigmoid(double[,] m)             // NORMALIZE <0 - 1> Activation Function
     {
         for (int i = 0; i < m.GetLength(0); i++)
         {
@@ -204,4 +297,5 @@ public class NNV2 : MonoBehaviour
         return m;
 
     }
+    */
 }
