@@ -39,7 +39,7 @@ public class ObjectTracker : MonoBehaviour
         go2 = new GameObject();
         go3 = new GameObject();
 
-
+        
 
         go1.transform.parent = this.transform;
         go2.transform.parent = this.transform;
@@ -95,70 +95,70 @@ public class ObjectTracker : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        time += Time.fixedDeltaTime;
+        time+=Time.fixedDeltaTime;
         foodList = GameObject.FindGameObjectsWithTag("Food");
         agentList = GameObject.FindGameObjectsWithTag("Agent");
         enemyList = GameObject.FindGameObjectsWithTag("Enemy");
 
         //if time save data point
-        if (time > 100)
+        if(time > 100)
         {
-
+            
             foodData.Add(foodList.Length);
             agentData.Add(agentList.Length);
             enemyData.Add(enemyList.Length);
-            UpdateDataPoints(foodList.Length / 10, agentList.Length / 10, enemyList.Length / 10);
-            i += 1;
+            UpdateDataPoints(foodList.Length/10,agentList.Length/10,enemyList.Length/10);
+            i+=1;
             time = 0;
         }
-        this.transform.position = new Vector3(-100, 0, 100);
+        this.transform.position = new Vector3(-100,0,100);
     }
 
-    void UpdateDataPoints(float x, float y, float z)
+    void UpdateDataPoints(float x,float y,float z)
     {
 
         // GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         // sphere.transform.position = new Vector3(i,x, 0);
         // sphere.GetComponent<Renderer>().material.color = new Color(255,0,0);
 
-        lineRenderer.positionCount = i + 1;
-        originalData[i] = new Vector3((i), z + 1, 0);
-        lineRenderer.SetPosition(i, new Vector3((i * scalingFactor), x + 1, 0));
+        lineRenderer.positionCount = i+1;
+        originalData[i] = new Vector3((i),z+1, 0);
+        lineRenderer.SetPosition( i,new Vector3((i*scalingFactor), x+1, 0));
 
 
         // GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         // sphere2.transform.position = new Vector3(i,y, 0);
         // sphere2.GetComponent<Renderer>().material.color = new Color(0,255,0);
 
-        lineRenderer2.positionCount = i + 1;
-        originalData2[i] = new Vector3((i), z + 1, 0);
-        lineRenderer2.SetPosition(i, new Vector3((i * scalingFactor), y + 1, 0));
-
+        lineRenderer2.positionCount = i+1;
+        originalData2[i] = new Vector3((i),z+1, 0);
+        lineRenderer2.SetPosition(i, new Vector3((i*scalingFactor),y+1, 0));
+        
 
         // GameObject sphere3 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         // sphere3.transform.position = new Vector3(i,z, 0);
         // sphere3.GetComponent<Renderer>().material.color = new Color(0,0,255);
 
-        lineRenderer3.positionCount = i + 1;
-        originalData3[i] = new Vector3((i), z + 1, 0);
-        lineRenderer3.SetPosition(i, new Vector3((i * scalingFactor), z + 1, 0));
+        lineRenderer3.positionCount = i+1;
+        originalData3[i] = new Vector3((i),z+1, 0);
+        lineRenderer3.SetPosition(i, new Vector3((i*scalingFactor),z+1, 0));
 
-        if (scalingFactor * i > 100)
+        if(scalingFactor*i > 100)
         {
-            scalingFactor = scalingFactor * .9f;
-            Vector3[] test = new Vector3[1000000];
-            Vector3[] test2 = new Vector3[1000000];
-            Vector3[] test3 = new Vector3[1000000];
+            scalingFactor = scalingFactor*.9f;
+            Vector3[] test = new Vector3[1000000] ; 
+            Vector3[] test2 = new Vector3[1000000] ; 
+            Vector3[] test3 = new Vector3[1000000] ; 
             lineRenderer.GetPositions(test);
             lineRenderer2.GetPositions(test2);
             lineRenderer3.GetPositions(test3);
             // Debug.Log(test.Length);
-            for (int j = 0; j < test.Length; j++)
+            for(int j =0; j < test.Length; j++)
             {
 
-                test[j].x = originalData[j].x * scalingFactor;
-                test2[j].x = originalData2[j].x * scalingFactor;
-                test3[j].x = originalData3[j].x * scalingFactor;
+                test[j].x = originalData[j].x*scalingFactor;
+                test2[j].x = originalData2[j].x*scalingFactor;
+                test3[j].x = originalData3[j].x*scalingFactor;
             }
             lineRenderer.SetPositions(test);
             lineRenderer2.SetPositions(test2);

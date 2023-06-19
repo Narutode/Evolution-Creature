@@ -14,8 +14,7 @@ public class SimSpeedController : MonoBehaviour
 
 
 
-    void Update()
-    {
+    void Update() {
         //if the space bar is pressed, change autoAdjust to the opposite of what it currently is
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -33,7 +32,7 @@ public class SimSpeedController : MonoBehaviour
         if (timeSum > 1)
         {
             timeSum = 0;
-            if (autoAdjust)
+            if(autoAdjust)
             {
                 AdjustGameSpeed();
             }
@@ -41,12 +40,11 @@ public class SimSpeedController : MonoBehaviour
             {
                 Time.timeScale = gameSpeed;
             }
-
+                
         }
     }
 
-    void AdjustGameSpeed()
-    {
+    void AdjustGameSpeed() {
         if (fpsAvg < 60)
         {
             gameSpeed = gameSpeed * .9f;
@@ -58,11 +56,10 @@ public class SimSpeedController : MonoBehaviour
 
 
         //keeps the game speed between 0.1 and 100 to prevent the game from freezing or crashing
-        if (gameSpeed < 0.1f)
-        {
+        if(gameSpeed < 0.1f){
             gameSpeed = 0.1f;
         }
-        else if (gameSpeed > 100)
+        else if(gameSpeed > 100)
         {
             gameSpeed = 100;
         }

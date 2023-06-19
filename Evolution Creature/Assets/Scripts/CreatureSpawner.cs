@@ -18,13 +18,13 @@ public class CreatureSpawner : MonoBehaviour
         if (agentList.Length < 1)
         {
             SpawnCreature();
-        }
+        } 
     }
 
     void SpawnCreature()
     {
-        int x = Random.Range(-100, 101) * floorScale;
-        int z = Random.Range(-100, 101) * floorScale;
+        int x = Random.Range(-100, 101)*floorScale;
+        int z = Random.Range(-100, 101)*floorScale;
         Instantiate(agentPrefab, new Vector3((float)x, 0.75f, (float)z), Quaternion.identity);
     }
 }

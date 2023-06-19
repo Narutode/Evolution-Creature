@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,8 +32,8 @@ public class FoodSpawner : MonoBehaviour
 
     void SpawnFood()
     {
-        int x = Random.Range(-100, 101) * floorScale;
-        int z = Random.Range(-100, 101) * floorScale;
+        int x = Random.Range(-100, 101)*floorScale;
+        int z = Random.Range(-100, 101)*floorScale;
         Instantiate(myPrefab, new Vector3((float)x, 0.75f, (float)z), Quaternion.identity);
     }
 }

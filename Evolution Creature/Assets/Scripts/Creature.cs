@@ -24,8 +24,8 @@ public class Creature : MonoBehaviour
     public float[] distances = new float[6];
 
     public float mutationAmount = 0.8f;
-    public float mutationChance = 0.2f;
-    public NeuralNetworkV2 nn;
+    public float mutationChance = 0.2f; 
+    public NN nn;
     public Movement movement;
 
     float relativeFoodX;
@@ -38,7 +38,7 @@ public class Creature : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        nn = gameObject.GetComponent<NeuralNetworkV2>();
+        nn = gameObject.GetComponent<NN>();
         movement = gameObject.GetComponent<Movement>();
         distances = new float[6];
 
@@ -49,11 +49,11 @@ public class Creature : MonoBehaviour
     void FixedUpdate()
     {
         //only do this once
-        if (!isMutated)
+        if(!isMutated)
         {
             //call mutate function to mutate the neural network
             MutateCreature();
-            this.transform.localScale = new Vector3(size, size, size);
+            this.transform.localScale = new Vector3(size,size,size);
             isMutated = true;
             energy = 20;
         }
@@ -110,7 +110,7 @@ public class Creature : MonoBehaviour
                 if (hit.transform.gameObject.tag == "Food")
                 {
                     // Use the length of the raycast as the distance to the food object
-                    distances[i] = hit.distance / viewDistance;
+                    distances[i] = hit.distance/viewDistance;
                 }
                 else
                 {
@@ -128,10 +128,10 @@ public class Creature : MonoBehaviour
         }
 
         // Setup inputs for the neural network
-        float[] inputsToNN = distances;
+        float [] inputsToNN = distances;
 
         // Get outputs from the neural network
-        float[] outputsFromNN = nn.Brain(inputsToNN);
+        float [] outputsFromNN = nn.Brain(inputsToNN);
 
         //Store the outputs from the neural network in variables
         FB = outputsFromNN[0];
@@ -141,7 +141,7 @@ public class Creature : MonoBehaviour
         if (isUser)
         {
             FB = Input.GetAxis("Vertical");
-            LR = Input.GetAxis("Horizontal") / 10;
+            LR = Input.GetAxis("Horizontal")/10;
         }
 
         //Move the agent using the move function
@@ -185,7 +185,7 @@ public class Creature : MonoBehaviour
         {
             this.transform.Rotate(0, 0, 180);
             //this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + 3.5f, this.transform.position.z);
-            Destroy(this.gameObject, 3);
+            Destroy(this.gameObject,3);
             GetComponent<Movement>().enabled = false;
         }
 
@@ -193,10 +193,10 @@ public class Creature : MonoBehaviour
 
     private void MutateCreature()
     {
-        if (mutateMutations)
+        if(mutateMutations)
         {
-            mutationAmount += Random.Range(-1.0f, 1.0f) / 100;
-            mutationChance += Random.Range(-1.0f, 1.0f) / 100;
+            mutationAmount += Random.Range(-1.0f, 1.0f)/100;
+            mutationChance += Random.Range(-1.0f, 1.0f)/100;
         }
 
         //make sure mutation amount and chance are positive using max function
@@ -214,7 +214,7 @@ public class Creature : MonoBehaviour
         float agentZ;
         float foodX = 0;
         float foodZ = 0;
-
+        
         float minFoodDistance = -1;
         float foodDistance = 0;
         int minFoodIndex = -1;
@@ -227,11 +227,11 @@ public class Creature : MonoBehaviour
 
         //use a sphere cast to find all food in range (determined by viewDistance) of the agent and add them to a list of edible food.
         //this helps optimize the code by not having to check every food object in the scene.
-        if (Random.value * 100 < 5)
+        if(Random.value*100 < 5)
         {
             edibleFoodList.Clear();
             Collider[] hitColliders = Physics.OverlapSphere(this.transform.position, viewDistance);
-            foreach (var hit in hitColliders)
+            foreach(var hit in hitColliders)
             {
                 if (hit.gameObject.tag == "Food")
                 {
@@ -239,13 +239,13 @@ public class Creature : MonoBehaviour
                 }
             }
         }
-
+        
         //find closest food in range of agent
-        if (Random.value * 100 < 50)
+        if(Random.value*100 < 50)
         {
             for (int i = 0; i < edibleFoodList.Count; i++)
             {
-                if (edibleFoodList[i] != null)
+                if(edibleFoodList[i] != null)
                 {
                     foodX = edibleFoodList[i].transform.position.x;
                     foodZ = edibleFoodList[i].transform.position.z;
@@ -265,23 +265,23 @@ public class Creature : MonoBehaviour
             }
         }
 
-        return (closestFood);
+        return(closestFood);
     }
 
     public void Reproduce()
     {
         //replicate
-        for (int i = 0; i < numberOfChildren; i++) // I left this here so I could possibly change the number of children a parent has at a time.
+        for (int i = 0; i< numberOfChildren; i ++) // I left this here so I could possibly change the number of children a parent has at a time.
         {
             //create a new agent, and set its position to the parent's position + a random offset in the x and z directions (so they don't all spawn on top of each other)
             GameObject child = Instantiate(agentPrefab, new Vector3(
-                (float)this.transform.position.x + Random.Range(-10, 11),
-                0.75f,
-                (float)this.transform.position.z + Random.Range(-10, 11)),
+                (float)this.transform.position.x + Random.Range(-10, 11), 
+                0.75f, 
+                (float)this.transform.position.z+ Random.Range(-10, 11)), 
                 Quaternion.identity);
-
+            
             //copy the parent's neural network to the child
-            child.GetComponent<NeuralNetworkV2>().layers = GetComponent<NeuralNetworkV2>().copyLayers();
+            child.GetComponent<NN>().layers = GetComponent<NN>().copyLayers();
         }
         reproductionEnergy = 0;
 
