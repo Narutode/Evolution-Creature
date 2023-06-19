@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class WaveFunctionCollapse : MonoBehaviour
 {
-    private WFCTile[,,] grid;
+    private WFCTile[,] grid;
 
     public GameObject cube;
 

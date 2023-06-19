@@ -19,6 +19,10 @@ using UnityEngine;
  * 2 -> 0, 2, 3, 5, 7, 9, 11
  * 3 -> 0 _ 11
  * 4 -> 
+ *
+ * 6 Conditions : N, E, S, W, H, B
+ *
+ *  if(n) > n 
  * 
  */
 
