@@ -26,19 +26,20 @@ public class WFCTile
         posZ = z;
     }
 
-    public bool Update(WFCTile tile, List<int> cont)
+    public bool Update(List<int> cont)
     {
-        if (tile.cell == -1)
+        if (cell == -1)
         {
             List<int> cellToRemove = new List<int>();
-            foreach (var p in tile.tilePossible)
+            foreach (var p in tilePossible)
             {
                 if(!cont.Contains(p))
                     cellToRemove.Add(p);
             }
             foreach (var p in cellToRemove)
             {
-                tile.tilePossible.Remove(p);
+                //Debug.Log("rreeeeeeeeeeee");
+                tilePossible.Remove(p);
             }
             return true;
         }
