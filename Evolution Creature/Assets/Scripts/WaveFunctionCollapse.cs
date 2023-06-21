@@ -2,26 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-/*
- *
- * 0 : Vide
- * 1,2 : Route N/S, E/W
- * 3 : route Croix
- * 4, 5, 6, 7 : Escalier Montent N, E, S, W
- * 8, 9, 10, 11 : Escalier descend N, E, S, W
- *
- *
- * 0 -> 0 _ 11
- * 1 -> 0, 1, 3, 4, 6, 8, 10
- * 2 -> 0, 2, 3, 5, 7, 9, 11
- * 3 -> 0 _ 11
- * 4 -> 
- *
- * 6 Conditions : N, E, S, W, H, B
- *
- *  if(n) > n 
- * 
- */
+
 public class WaveFunctionCollapse : MonoBehaviour
 {
     private WFCTile[,,] grid;
@@ -29,32 +10,36 @@ public class WaveFunctionCollapse : MonoBehaviour
     public GameObject cube;
 
     private int sizeX = 20, sizeY = 20, sizeZ = 20;
+
     //private int curX, curY;
+    public int sizeNeighborhood = 2;
 
     public List<RoadTile> availableTiles;
     private int minP = 12;
     private WFCTile curTile;
+
+    public GameObject tileEx;
     //private List<WFCTile> tileToCheck;
-    //private List<WFCTile> tileToRemove;
     //private List<WFCTile> tileToAdd;
+
     //                 0      1        2        3        4         5        6        7     
     private RoadTile empty, roadNS, roadEW, roadCross, roadUpN, roadUpS, roadUpE, roadUpW;
-    public GameObject roadNSGO,roadEWGO,roadUpNGO,roadCrossGO,roadUpSGO,roadUpEGO,roadUpWGO; 
-    
+    public GameObject roadNSGO, roadEWGO, roadUpNGO, roadCrossGO, roadUpSGO, roadUpEGO, roadUpWGO;
+
     // Start is called before the first frame update
     void Start()
     {
         availableTiles = new List<RoadTile>(); //add road tiles 
 
-        empty = new RoadTile(0, null);
-        roadNS = new RoadTile(1, roadNSGO);
-        roadEW = new RoadTile(2, roadEWGO);
-        roadCross = new RoadTile(3, roadCrossGO);
-        roadUpN = new RoadTile(4, roadUpNGO);
-        roadUpS = new RoadTile(5, roadUpSGO);
-        roadUpE = new RoadTile(6, roadUpEGO);
-        roadUpW = new RoadTile(7, roadUpWGO);
-        
+        empty = new RoadTile(0, null, sizeNeighborhood);
+        roadNS = new RoadTile(1, roadNSGO, sizeNeighborhood);
+        roadEW = new RoadTile(2, roadEWGO, sizeNeighborhood);
+        roadCross = new RoadTile(3, roadCrossGO, sizeNeighborhood);
+        roadUpN = new RoadTile(4, roadUpNGO, sizeNeighborhood);
+        roadUpS = new RoadTile(5, roadUpSGO, sizeNeighborhood);
+        roadUpE = new RoadTile(6, roadUpEGO, sizeNeighborhood);
+        roadUpW = new RoadTile(7, roadUpWGO, sizeNeighborhood);
+
         availableTiles.Add(empty);
         availableTiles.Add(roadNS);
         availableTiles.Add(roadEW);
@@ -65,11 +50,11 @@ public class WaveFunctionCollapse : MonoBehaviour
         availableTiles.Add(roadUpW);
 
         fillConstraints();
-
-        //tileToAdd = new List<WFCTile>();
-        //tileToRemove = new List<WFCTile>();
-        //tileToCheck = new List<WFCTile>();
-        grid = new WFCTile[sizeX,sizeY,sizeZ];
+/*
+        tileToAdd = new List<WFCTile>();
+        tileToRemove = new List<WFCTile>();
+        tileToCheck = new List<WFCTile>();*/
+        grid = new WFCTile[sizeX, sizeY, sizeZ];
         for (int x = 0; x < sizeX; x++)
         {
             for (int y = 0; y < sizeY; y++)
@@ -83,8 +68,8 @@ public class WaveFunctionCollapse : MonoBehaviour
 
         curTile = grid[sizeX / 2, sizeY / 2, sizeZ / 2];
         curTile.tilePossible.Clear();
-        curTile.cell = 2;
-        //tileToCheck.Add(grid[sizeX/2,sizeY/2,sizeZ/2]);
+        curTile.cell = 3;
+        //tileToCheck.Add(curTile);
     }
 
     // Update is called once per frame
@@ -94,138 +79,137 @@ public class WaveFunctionCollapse : MonoBehaviour
         {
             //foreach (var t in tileToCheck)
             //{
-                //tileToRemove.Add(t);
+            //tileToRemove.Add(t);
 
-                //WFCTile tile = t;
+            //curTile = t;
 
-                if (curTile.cell == -1)
+            if (curTile.cell == -1)
+            {
+                if (curTile.tilePossible.Count == 0)
                 {
-                    if (curTile.tilePossible.Count == 0)
-                    {
-                        curTile.cell = 0;
-                        curTile.tilePossible.Clear();
-                    }
-                    else
-                    {
-                        int r = Random.Range(0, curTile.tilePossible.Count);
-                        curTile.cell = curTile.tilePossible[r];
-                        curTile.tilePossible.Clear();
-                    }
-                    //Debug.Log(tile.cell);
-                }// 
-
-                if(curTile.cell != -1 && curTile.cell != 0)
-                    Instantiate(availableTiles[curTile.cell].roadGO, new Vector3(curTile.posX, curTile.posY, curTile.posZ), availableTiles[curTile.cell].roadGO.transform.rotation);
-
-                for (int a = -1; a < 2; a++)
+                    curTile.cell = 0;
+                }
+                else
                 {
-                    for (int b = -1; b < 2; b++)
+                    int r = Random.Range(0, curTile.tilePossible.Count);
+                    curTile.cell = curTile.tilePossible[r];
+                    curTile.tilePossible.Clear();
+                }
+                Debug.Log(curTile.cell);
+            }
+
+            if (curTile.cell > 0)
+                Instantiate(availableTiles[curTile.cell].roadGO,
+                    new Vector3(curTile.posX, curTile.posY, curTile.posZ),
+                    availableTiles[curTile.cell].roadGO.transform.rotation);
+
+            for (int a = -sizeNeighborhood; a <= sizeNeighborhood; a++)
+            {
+                for (int b = -sizeNeighborhood; b <= sizeNeighborhood; b++)
+                {
+                    for (int c = -sizeNeighborhood; c <= sizeNeighborhood; c++)
                     {
-                        for (int c = -1; c < 2; c++)
+                        if ((a != 0 || b != 0 || c != 0) && curTile.posX + a >= 0 && curTile.posX + a < sizeX &&
+                            curTile.posY + b >= 0 &&
+                            curTile.posY + b < sizeY && curTile.posZ + c >= 0 && curTile.posZ + c < sizeZ)
                         {
-                            if ((a != 0 || b != 0 || c != 0) && curTile.posX + a >= 0 && curTile.posX + a < sizeX &&
-                                curTile.posY + b >= 0 &&
-                                curTile.posY + b < sizeY && curTile.posZ + c >= 0 && curTile.posZ + c < sizeZ)
-                            {
-                                var lookCell = grid[curTile.posX + a, curTile.posY + b, curTile.posZ + c];
-                                lookCell.Update(availableTiles[curTile.cell].contraintes[a + 1, b + 1, c + 1]);
-                            }
+                            var lookCell = grid[curTile.posX + a, curTile.posY + b, curTile.posZ + c];
+                            lookCell.Update(availableTiles[curTile.cell].contraintes[a + sizeNeighborhood,
+                                b + sizeNeighborhood, c + sizeNeighborhood]);
+                            //if (!tileToAdd.Contains(lookCell))
+                            //tileToAdd.Add(lookCell);
                         }
                     }
                 }
+            }
 
-                minP = 12;
-                curTile = null;
-                for (int x = 0; x < sizeX; x++)
+            minP = 12;
+            curTile = null;
+            for (int x = 0; x < sizeX; x++)
+            {
+                for (int y = 0; y < sizeY; y++)
                 {
-                    for (int y = 0; y < sizeY; y++)
+                    for (int z = 0; z < sizeZ; z++)
                     {
-                        for (int z = 0; z < sizeZ; z++)
+                        if (grid[x, y, z].cell == -1 && grid[x, y, z].tilePossible.Count < minP)
                         {
-                            if (grid[x, y, z].cell == -1 && grid[x, y, z].tilePossible.Count < minP)
-                            {
-                                curTile = grid[x, y, z];
-                                minP = curTile.tilePossible.Count;
-                            }
+                            curTile = grid[x, y, z];
+                            minP = curTile.tilePossible.Count;
+                            if (minP == 1)
+                                return;
                         }
                     }
                 }
-
-                
-                
-                Debug.Log(minP);
+            }
+            //Debug.Log(minP);
         }
+/*
+            Debug.Log(tileToAdd.Count);
 
-        //Debug.Log(tileToAdd.Count);
-            /*
-            foreach (var v2 in tileToRemove)
-            {
-                tileToCheck.Remove(v2);
-            }
-            tileToRemove.Clear();
-        
-            foreach (var v2 in tileToAdd)
-            {
-                tileToCheck.Add(v2);
-            }
+            tileToCheck.Clear();
+            tileToCheck.AddRange(tileToAdd.ToList());
             tileToAdd.Clear();*/
     }
+
     //           0      1     2        3        4        5       6      7     
     //RoadTile empty,roadNS,roadEW,roadCross,roadUpN,roadUpE,roadUpS,roadUpW
     void fillConstraints()
     {
-        int[,,] exGrid = {{
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0}},
-            {
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0}},
-            {
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 2, 5},
-                {2, 2, 5, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0}},
-            {
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0}}, 
-            {
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0}},
-        };
+        int size = 13;
+        int[,,] exGrid = new int [size, size, size];
+        int x0, y0, z0;
 
-        for (int x = 0; x < 5; x++)
+        for (int i = 0; i < tileEx.transform.childCount; i++)
         {
-            for (int y = 0; y < 5; y++)
+            var ex = tileEx.transform.GetChild(i);
+
+            x0 = (int) ex.transform.localPosition.x;
+            y0 = (int) ex.transform.localPosition.y;
+            z0 = (int) ex.transform.localPosition.z;
+
+            if (x0 >= 0 && x0 < size && y0 >= 0 && y0 < size && z0 >= 0 && z0 < size)
             {
-                for (int z = 0; z < 5; z++)
+                int cell = 0;
+                if (ex.gameObject.name.Contains("NS"))
+                    cell = 1;
+                else if (ex.gameObject.name.Contains("EW"))
+                    cell = 2;
+                else if (ex.gameObject.name.Contains("Cross"))
+                    cell = 3;
+                else if (ex.gameObject.name.Contains("UpN"))
+                    cell = 4;
+                else if (ex.gameObject.name.Contains("UpE"))
+                    cell = 5;
+                else if (ex.gameObject.name.Contains("UpS"))
+                    cell = 6;
+                else if (ex.gameObject.name.Contains("UpW"))
+                    cell = 7;
+                //Debug.Log(cell);
+                exGrid[x0, y0, z0] = cell;
+            }
+        }
+        for (int x = 0; x < size; x++)
+        {
+            for (int y = 0; y < size; y++)
+            {
+                for (int z = 0; z < size; z++)
                 {
-                    
                     RoadTile curRoadTile = availableTiles[exGrid[x, y, z]];
-                    for (int a = -1; a < 2; a++)
+
+                    for (int a = -sizeNeighborhood; a <= sizeNeighborhood; a++)
                     {
-                        for (int b = -1; b < 2; b++)
+                        for (int b = -sizeNeighborhood; b <= sizeNeighborhood; b++)
                         {
-                            for (int c = -1; c < 2; c++)
+                            for (int c = -sizeNeighborhood; c <= sizeNeighborhood; c++)
                             {
-                                if ((a != 0 || b != 0 || c != 0) && x + a >= 0 && x + a < 5 && y + b >= 0 &&
-                                    y + b < 5 && z + c >= 0 && z + c < 5)
+                                if ((a != 0 || b != 0 || c != 0) && x + a >= 0 && x + a < size && y + b >= 0 &&
+                                    y + b < size && z + c >= 0 && z + c < size)
                                 {
                                     int cons = exGrid[x + a, y + b, z + c];
-                                    if(!curRoadTile.contraintes[a+1,b+1,c+1].Contains(cons))
-                                        curRoadTile.contraintes[a+1,b+1,c+1].Add(cons);
+                                    if (curRoadTile.contraintes[a + sizeNeighborhood, b + sizeNeighborhood,
+                                            c + sizeNeighborhood].Contains(cons))
+                                        curRoadTile.contraintes[a + sizeNeighborhood, b + sizeNeighborhood,
+                                            c + sizeNeighborhood].Remove(cons);
                                 }
                             }
                         }
@@ -233,5 +217,27 @@ public class WaveFunctionCollapse : MonoBehaviour
                 }
             }
         }
+        /*
+        RoadTile EmptyTile = availableTiles[0];
+        for (int a = -sizeNeighborhood; a <= sizeNeighborhood; a++)
+        {
+            for (int b = -sizeNeighborhood; b <= sizeNeighborhood; b++)
+            {
+                for (int c = -sizeNeighborhood; c <= sizeNeighborhood; c++)
+                {
+                    for (int i = 0; i < 8; i++)
+                    {
+                        if (a != 0 || b != 0 || c != 0)
+                        {
+                            if (!EmptyTile.contraintes[a + sizeNeighborhood, b + sizeNeighborhood,
+                                    c + sizeNeighborhood].Contains(i))
+                                EmptyTile.contraintes[a + sizeNeighborhood, b + sizeNeighborhood,
+                                    c + sizeNeighborhood].Add(i);
+                        }
+                    }
+                }
+            }
+        }
+        */
     }
 }
