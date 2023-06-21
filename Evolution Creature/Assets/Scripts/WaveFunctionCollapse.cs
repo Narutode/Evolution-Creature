@@ -81,6 +81,7 @@ public class WaveFunctionCollapse : MonoBehaviour
             //{
             //tileToRemove.Add(t);
 
+
             //curTile = t;
 
             if (curTile.cell == -1)
@@ -92,6 +93,8 @@ public class WaveFunctionCollapse : MonoBehaviour
                 else
                 {
                     int r = Random.Range(0, curTile.tilePossible.Count);
+                    while(curTile.tilePossible[r] == 0)
+                        r = Random.Range(0, curTile.tilePossible.Count);
                     curTile.cell = curTile.tilePossible[r];
                     curTile.tilePossible.Clear();
                 }
@@ -113,9 +116,12 @@ public class WaveFunctionCollapse : MonoBehaviour
                             curTile.posY + b >= 0 &&
                             curTile.posY + b < sizeY && curTile.posZ + c >= 0 && curTile.posZ + c < sizeZ)
                         {
-                            var lookCell = grid[curTile.posX + a, curTile.posY + b, curTile.posZ + c];
-                            lookCell.Update(availableTiles[curTile.cell].contraintes[a + sizeNeighborhood,
-                                b + sizeNeighborhood, c + sizeNeighborhood]);
+                            if (curTile.cell != 0)
+                            {
+                                var lookCell = grid[curTile.posX + a, curTile.posY + b, curTile.posZ + c];
+                                lookCell.Update(availableTiles[curTile.cell].contraintes[a + sizeNeighborhood,
+                                    b + sizeNeighborhood, c + sizeNeighborhood]);
+                            }
                             //if (!tileToAdd.Contains(lookCell))
                             //tileToAdd.Add(lookCell);
                         }
@@ -195,6 +201,8 @@ public class WaveFunctionCollapse : MonoBehaviour
                 for (int z = 0; z < size; z++)
                 {
                     RoadTile curRoadTile = availableTiles[exGrid[x, y, z]];
+                    if(exGrid[x, y, z]==0)
+                        continue;
 
                     for (int a = -sizeNeighborhood; a <= sizeNeighborhood; a++)
                     {
@@ -206,10 +214,10 @@ public class WaveFunctionCollapse : MonoBehaviour
                                     y + b < size && z + c >= 0 && z + c < size)
                                 {
                                     int cons = exGrid[x + a, y + b, z + c];
-                                    if (curRoadTile.contraintes[a + sizeNeighborhood, b + sizeNeighborhood,
+                                    if (!curRoadTile.contraintes[a + sizeNeighborhood, b + sizeNeighborhood,
                                             c + sizeNeighborhood].Contains(cons))
                                         curRoadTile.contraintes[a + sizeNeighborhood, b + sizeNeighborhood,
-                                            c + sizeNeighborhood].Remove(cons);
+                                            c + sizeNeighborhood].Add(cons);
                                 }
                             }
                         }
@@ -217,7 +225,7 @@ public class WaveFunctionCollapse : MonoBehaviour
                 }
             }
         }
-        /*
+
         RoadTile EmptyTile = availableTiles[0];
         for (int a = -sizeNeighborhood; a <= sizeNeighborhood; a++)
         {
@@ -238,6 +246,5 @@ public class WaveFunctionCollapse : MonoBehaviour
                 }
             }
         }
-        */
     }
 }

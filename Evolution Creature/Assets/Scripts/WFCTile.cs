@@ -33,7 +33,7 @@ public class WFCTile
             List<int> cellToRemove = new List<int>();
             foreach (var p in tilePossible)
             {
-                if(cont.Contains(p))
+                if(!cont.Contains(p))
                     cellToRemove.Add(p);
             }
             foreach (var p in cellToRemove)

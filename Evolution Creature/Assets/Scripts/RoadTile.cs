@@ -14,7 +14,7 @@ public class RoadTile
 
     public RoadTile(int id, GameObject prefab, int sNei)
     {
-        int[] allVal = new[] {0, 1, 2, 3, 4, 5, 6, 7};
+        //int[] allVal = new[] {0, 1, 2, 3, 4, 5, 6, 7};
         tileId = id;
         roadGO = prefab;
         contraintes = new List<int>[2*sNei+1,2*sNei+1,2*sNei+1];
@@ -24,7 +24,7 @@ public class RoadTile
             {
                 for (int z = 0; z < 2*sNei+1; z++)
                 {
-                    contraintes[x, y, z] = new List<int>(allVal);
+                    contraintes[x, y, z] = new List<int>();
                 }
             }
         }
