@@ -106,7 +106,7 @@ public class Creature : MonoBehaviour
             if (Physics.Raycast(rayStart, rayDirection, out hit, viewDistance))
             {
                 // Draw a line representing the raycast in the scene view for debugging purposes
-                Debug.DrawRay(rayStart, rayDirection * hit.distance, Color.red);
+                Debug.DrawRay(rayStart, rayDirection * hit.distance, Color.green);
                 if (hit.transform.gameObject.tag == "Food")
                 {
                     // Use the length of the raycast as the distance to the food object
