@@ -5,65 +5,49 @@ using UnityEngine;
 
 public class Walker : MonoBehaviour
 {
-    
-    CharacterJoint[] joints;
-    Rigidbody[] rigidbodies;
+
+    ArticulationBody leg1, leg2, leg3, leg4;
+
 
     private void Awake()
     {
-        
-        joints = gameObject.GetComponents<CharacterJoint>();
-        rigidbodies = GameObject.Find("Legs").GetComponentsInChildren<Rigidbody>();
-    }
 
+        leg1 = GameObject.Find("Leg1.2").GetComponent<ArticulationBody>();
+        leg2 = GameObject.Find("Leg2.2").GetComponent<ArticulationBody>();
+        leg3 = GameObject.Find("Leg3.2").GetComponent<ArticulationBody>();
+        leg4 = GameObject.Find("Leg4.2").GetComponent<ArticulationBody>();
+
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKey(KeyCode.Space))
         {
-            foreach(Rigidbody r in rigidbodies)
-            {
-                switch (r.gameObject.tag)
-                {
-                    case "Part1":
-                        r.AddForce(Vector3.up * 100);
-                        break;
-                    case "Part2":
-                        r.AddForce(Vector3.forward * 100);
-                        break;
-                    case "Part3":
-                        r.AddForce(Vector3.back * 100);
-                        break;
-                }
-                ;
-            }
+            leg1.AddTorque(Vector3.back * 80); 
+            leg2.AddTorque(Vector3.forward * 80);
+            leg3.AddTorque(Vector3.right * 80);
+            leg4.AddTorque(Vector3.left * 80);
+
+
+        }
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            leg1.anchorRotation = Quaternion.Inverse(leg1.anchorRotation);
+            leg2.anchorRotation = Quaternion.Inverse(leg2.anchorRotation);
+            leg3.anchorRotation = Quaternion.Inverse(leg3.anchorRotation);
+            leg4.anchorRotation = Quaternion.Inverse(leg4.anchorRotation);
+
+
+
+
         }
 
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            foreach (Rigidbody r in rigidbodies)
-            {
-                switch (r.gameObject.tag)
-                {
-                    case "Part1":
-                        r.AddForce(Vector3.down * 100);
-                        break;
-                    case "Part2":
-                        r.AddForce(Vector3.back * 100);
-                        break;
-                    case "Part3":
-                        r.AddForce(Vector3.forward * 100);
-                        break;
-                }
-                ;
-            }
-        }
     }
 }
