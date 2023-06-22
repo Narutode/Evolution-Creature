@@ -75,7 +75,7 @@ public class WaveFunctionCollapse : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (curTile != null)
+        while (curTile != null)
         {
             //foreach (var t in tileToCheck)
             //{
@@ -93,8 +93,6 @@ public class WaveFunctionCollapse : MonoBehaviour
                 else
                 {
                     int r = Random.Range(0, curTile.tilePossible.Count);
-                    while(curTile.tilePossible[r] == 0)
-                        r = Random.Range(0, curTile.tilePossible.Count);
                     curTile.cell = curTile.tilePossible[r];
                     curTile.tilePossible.Clear();
                 }
@@ -225,7 +223,7 @@ public class WaveFunctionCollapse : MonoBehaviour
                 }
             }
         }
-
+/*
         RoadTile EmptyTile = availableTiles[0];
         for (int a = -sizeNeighborhood; a <= sizeNeighborhood; a++)
         {
@@ -245,6 +243,6 @@ public class WaveFunctionCollapse : MonoBehaviour
                     }
                 }
             }
-        }
+        }*/
     }
 }
