@@ -139,8 +139,6 @@ public class WaveFunctionCollapse : MonoBehaviour
                         {
                             curTile = grid[x, y, z];
                             minP = curTile.tilePossible.Count;
-                            if (minP == 1)
-                                return;
                         }
                     }
                 }
