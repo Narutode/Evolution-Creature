@@ -2,12 +2,10 @@
 
 public class NN : MonoBehaviour
 {
-    int [] networkShape = {5,32,2};
+    int [] networkShape = {8,32,12}; //Input : 5 rays,rotation torso (y et z), rotation chaque leg; Output : rotation (-1,0,1) pour chaque leg (3 x 4 outputs = 12)
     public Layer [] layers;
 
-    // Awake is called when the script instance is being loaded.
-    // Start is called before the first frame update.
-    // Awake gets called before Start which is why we use Awake here
+    
     public void Awake()
     {
         layers = new Layer[networkShape.Length - 1];
@@ -24,6 +22,7 @@ public class NN : MonoBehaviour
     //This function is used to feed forward the inputs through the network, and return the output, which is the decision of the network, in this case, the direction to move in.
     public float[] Brain(float [] inputs)
     {
+        
         for(int i = 0; i < layers.Length; i++)
         {
             if(i == 0)
@@ -42,7 +41,9 @@ public class NN : MonoBehaviour
             }    
         }
 
-        return(layers[layers.Length - 1].nodeArray);
+       
+        return (layers[layers.Length - 1].nodeArray);
+       
     }
 
     //This function is used to copy the weights and biases from one neural network to another.

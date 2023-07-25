@@ -1,57 +1,28 @@
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using Unity.VisualScripting;
 using UnityEngine;
 
-public class Walker : MonoBehaviour
+public class RobotManualInput : MonoBehaviour
 {
-
     public GameObject robot;
-   
 
 
-  
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        
         RobotController robotController = robot.GetComponent<RobotController>();
-
-        
-       
-        for (int j = 0; j < robotController.joints.Length; j++)
+        for (int i = 0; i < robotController.joints.Length; i++)
         {
-            
-            float inputVal = Input.GetAxis(robotController.joints[j].inputAxis);
-            
-           
-
+            float inputVal = Input.GetAxis(robotController.joints[i].inputAxis);
             if (Mathf.Abs(inputVal) > 0)
             {
                 RotationDirection direction = GetRotationDirection(inputVal);
-                robotController.RotateJoint(j, direction);
+                robotController.RotateJoint(i, direction);
                 return;
             }
         }
-
         robotController.StopAllJointRotations();
 
-
-
-
-
-
-
     }
-
 
 
     // HELPERS

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Creature : MonoBehaviour
@@ -15,13 +16,14 @@ public class Creature : MonoBehaviour
     public float reproductionEnergyGained = 1;
     public float reproductionEnergy = 0;
     public float reproductionEnergyThreshold = 10;
-    public float FB = 0;
-    public float LR = 0;
+    
+    public float[] legOutputs = new float[12];
     public int numberOfChildren = 1;
     private bool isMutated = false;
     float elapsed = 0f;
     public float lifeSpan = 0f;
     public float[] distances = new float[6];
+    public float[] rots = new float[2];
 
     public float mutationAmount = 0.8f;
     public float mutationChance = 0.2f; 
@@ -35,25 +37,32 @@ public class Creature : MonoBehaviour
 
     public bool isDead = false;
 
+   // public GameObject robot;
+    public GameObject[] robots;
+
+    RobotController[] robotControllers;
     // Start is called before the first frame update
     void Awake()
     {
         nn = gameObject.GetComponent<NN>();
         movement = gameObject.GetComponent<Movement>();
         distances = new float[6];
+        rots = new float[2];
 
         this.name = "Agent";
+
+        robotControllers = new RobotController[robots.Length];
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
         //only do this once
-        if(!isMutated)
+        if (!isMutated)
         {
             //call mutate function to mutate the neural network
             MutateCreature();
-            this.transform.localScale = new Vector3(size,size,size);
+            this.transform.localScale = new Vector3(size, size, size);
             isMutated = true;
             energy = 20;
         }
@@ -102,7 +111,7 @@ public class Creature : MonoBehaviour
             Quaternion rotation = Quaternion.AngleAxis(angle, Vector3.up);
             Vector3 rayDirection = rotation * transform.forward * -1;
             // Increase the starting point of the raycast by 0.1 units
-            Vector3 rayStart = transform.position + Vector3.up * 0.1f;
+            Vector3 rayStart = transform.GetChild(0).transform.position + Vector3.up * 0.1f;
             if (Physics.Raycast(rayStart, rayDirection, out hit, viewDistance))
             {
                 // Draw a line representing the raycast in the scene view for debugging purposes
@@ -110,7 +119,7 @@ public class Creature : MonoBehaviour
                 if (hit.transform.gameObject.tag == "Food")
                 {
                     // Use the length of the raycast as the distance to the food object
-                    distances[i] = hit.distance/viewDistance;
+                    distances[i] = hit.distance / viewDistance;
                 }
                 else
                 {
@@ -127,32 +136,111 @@ public class Creature : MonoBehaviour
             }
         }
 
+        rots[0] = transform.GetChild(0).rotation.eulerAngles.y / 360;
+
+        rots[1] = transform.GetChild(0).rotation.eulerAngles.z / 360;
+
+        
+
         // Setup inputs for the neural network
-        float [] inputsToNN = distances;
+        //float[] inputsToNN = distances + rots;
+        float[] inputsToNN = new float[distances.Length + rots.Length];
+
+        for (int i = 0; i < distances.Length; i++)
+            inputsToNN[i] = distances[i];
+        for (int i = 0; i < rots.Length; i++)
+            inputsToNN[i + distances.Length] = rots[i];
 
         // Get outputs from the neural network
-        float [] outputsFromNN = nn.Brain(inputsToNN);
+        float[] outputsFromNN = nn.Brain(inputsToNN);
 
         //Store the outputs from the neural network in variables
-        FB = outputsFromNN[0];
-        LR = outputsFromNN[1];
+        legOutputs = outputsFromNN;
 
+       
         //if the agent is the user, use the inputs from the user instead of the neural network
+
         if (isUser)
         {
-            FB = Input.GetAxis("Vertical");
-            LR = Input.GetAxis("Horizontal")/10;
+           
+        }
+       
+        //Move the agent using the move function
+        //movement.Move(FB, LR);
+
+        //RobotController robotController = robot.GetComponent<RobotController>();
+
+        
+
+        if (!isDead) {
+
+           
+
+            for (int i = 0; i < robots.Length; i++)
+            {
+                robotControllers[i] = robots[i].GetComponent<RobotController>();
+                Debug.Log("Controller : " + robots[i].name);
+            }
+
+            // Calculate the number of joints per controller
+            int jointsPerController = legOutputs.Length / robots.Length;
+
+            // chaque controller
+            for (int i = 0; i < robotControllers.Length; i++)
+            {
+                // chaque joint
+                for (int j = 0; j < jointsPerController; j++)
+                {
+                    // Calculate the correct index in the legOutputs array
+                    int legOutputIndex = i * jointsPerController + j;
+
+                    // Call RotateLegs for the current joint of the current robot controller
+                    RotateLegs(i, j, legOutputIndex);
+                    
+                }
+                
+            }
+
+          
+
         }
 
-        //Move the agent using the move function
-        movement.Move(FB, LR);
+
+    }
+    void RotateLegs(int controller, int index, int legOutputIndex)
+    {
+        
+
+        RotationDirection dir = GetRotationDirection(legOutputs[legOutputIndex]);
+        Debug.Log("Controller : " + controller + " Index : " + index + " legOutput : " + legOutputIndex + " Rotation Direction : " + dir);
+
+        robotControllers[controller].RotateJoint(index, dir);
+        
+
+
+        return;
+    }
+    static RotationDirection GetRotationDirection(float inputVal)
+    {
+        if (inputVal > 0)
+        {
+            return RotationDirection.Positive;
+        }
+        else if (inputVal < 0)
+        {
+            return RotationDirection.Negative;
+        }
+        else
+        {
+            return RotationDirection.None;
+        }
     }
 
     //this function gets called whenever the agent collides with a trigger. (Which in this case is the food)
     void OnTriggerEnter(Collider col)
     {
         //if the agent collides with a food object, it will eat it and gain energy.
-        if (col.gameObject.tag == "Food" && canEat)
+        if (col.gameObject.CompareTag("Food") && canEat)
         {
             energy += energyGained;
             reproductionEnergy += reproductionEnergyGained;
@@ -183,10 +271,10 @@ public class Creature : MonoBehaviour
         float agentY = this.transform.position.y;
         if (energy <= 0 || agentY < -10)
         {
-            this.transform.Rotate(0, 0, 180);
+            //this.transform.Rotate(0, 0, 180);
             //this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y + 3.5f, this.transform.position.z);
             Destroy(this.gameObject,3);
-            GetComponent<Movement>().enabled = false;
+            //GetComponent<Movement>().enabled = false;
         }
 
     }

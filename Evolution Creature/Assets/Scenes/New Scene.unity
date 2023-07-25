@@ -911,7 +911,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3dfac08fb63cc6f4fa3471933d92ef4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentPrefab: {fileID: 1280673872942109312, guid: 3dbaf859dc58bf8408979e0606fe2cf7, type: 3}
+  agentPrefab: {fileID: 8746334532412852109, guid: 2d8ac9907d70f714eae3a572b4829546, type: 3}
   floorScale: 1
 --- !u!1 &1924782617
 GameObject:
