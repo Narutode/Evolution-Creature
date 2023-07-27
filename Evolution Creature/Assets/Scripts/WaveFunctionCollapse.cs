@@ -80,7 +80,7 @@ public class WaveFunctionCollapse : MonoBehaviour
 
         
 
-        if (curTile != null)
+        while (curTile != null)
         {
             if (curTile.tilePossible.Count() > 1)
             {
@@ -107,25 +107,26 @@ public class WaveFunctionCollapse : MonoBehaviour
             }
 
             propagateTile(curTile);
-        }
-        
-        int nbPoss = 10;
-        curTile = null;
-        for (int x = 0; x < sizeX; x++)
-        {
-            for (int y = 0; y < sizeY; y++)
+            
+            curTile = null;
+            int nbPoss = 10;
+
+            for (int x = 0; x < sizeX; x++)
             {
-                for (int z = 0; z < sizeZ; z++)
+                for (int y = 0; y < sizeY; y++)
                 {
-                    if (grid[x, y, z].tilePossible.Count() > 0 && grid[x, y, z].tilePossible.Count() <= nbPoss && grid[x, y, z].cell == -1)
+                    for (int z = 0; z < sizeZ; z++)
                     {
-                        nbPoss = grid[x, y, z].tilePossible.Count();
-                        curTile = grid[x, y, z];
+                        if (grid[x, y, z].tilePossible.Count() > 0 && grid[x, y, z].tilePossible.Count() <= nbPoss && grid[x, y, z].cell == -1)
+                        {
+                            nbPoss = grid[x, y, z].tilePossible.Count();
+                            curTile = grid[x, y, z];
+                        }
                     }
                 }
             }
         }
-        
+
         /*
     while (tileToCheck.Count() > 0)
     {
