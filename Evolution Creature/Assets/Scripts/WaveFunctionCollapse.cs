@@ -78,8 +78,39 @@ public class WaveFunctionCollapse : MonoBehaviour
     {
         //Créer des modèles de contraintes pour chaque tuile ???
 
-        WFCTile nextTile = null;
+        
+
+        if (curTile != null)
+        {
+            if (curTile.tilePossible.Count() > 1)
+            {
+                int rand = Random.Range(0, curTile.tilePossible.Count());
+                curTile.cell = curTile.tilePossible[rand];
+                curTile.tilePossible.Clear();
+            } else if(curTile.tilePossible.Count() == 1)
+            {
+                curTile.cell = curTile.tilePossible[0];
+                curTile.tilePossible.Clear();
+            }
+            else
+            {
+                curTile.cell = 0;
+            }
+            //CollapseTileRandom(nextTile);
+
+            //Instanciation de la tile
+            if (curTile.cell > 0)
+            {
+                Instantiate(availableTiles[curTile.cell].roadGO,
+                    new Vector3(curTile.posX, curTile.posY, curTile.posZ),
+                    availableTiles[curTile.cell].roadGO.transform.rotation);
+            }
+
+            propagateTile(curTile);
+        }
+        
         int nbPoss = 10;
+        curTile = null;
         for (int x = 0; x < sizeX; x++)
         {
             for (int y = 0; y < sizeY; y++)
@@ -89,39 +120,10 @@ public class WaveFunctionCollapse : MonoBehaviour
                     if (grid[x, y, z].tilePossible.Count() > 0 && grid[x, y, z].tilePossible.Count() <= nbPoss && grid[x, y, z].cell == -1)
                     {
                         nbPoss = grid[x, y, z].tilePossible.Count();
-                        nextTile = grid[x, y, z];
+                        curTile = grid[x, y, z];
                     }
                 }
             }
-        }
-
-        if (nextTile != null)
-        {
-            if (nextTile.tilePossible.Count() > 1)
-            {
-                int rand = Random.Range(0, nextTile.tilePossible.Count());
-                nextTile.cell = nextTile.tilePossible[rand];
-                nextTile.tilePossible.Clear();
-            } else if(nextTile.tilePossible.Count() == 1)
-            {
-                nextTile.cell = nextTile.tilePossible[0];
-                nextTile.tilePossible.Clear();
-            }
-            else
-            {
-                nextTile.cell = 0;
-            }
-            //CollapseTileRandom(nextTile);
-
-            //Instanciation de la tile
-            if (nextTile.cell > 0)
-            {
-                Instantiate(availableTiles[nextTile.cell].roadGO,
-                    new Vector3(nextTile.posX, nextTile.posY, nextTile.posZ),
-                    availableTiles[nextTile.cell].roadGO.transform.rotation);
-            }
-
-            propagateTile(nextTile);
         }
         
         /*
@@ -346,9 +348,9 @@ public class WaveFunctionCollapse : MonoBehaviour
                             Debug.Log("lookCell.cell: " + lookCell.cell);
 
                             propagateTile(lookCell);
-                            Instantiate(availableTiles[lookCell.cell].roadGO,
-                                new Vector3(lookCell.posX, lookCell.posY, lookCell.posZ),
-                                availableTiles[lookCell.cell].roadGO.transform.rotation);
+                            //Instantiate(availableTiles[lookCell.cell].roadGO,
+                            //    new Vector3(lookCell.posX, lookCell.posY, lookCell.posZ),
+                            //    availableTiles[lookCell.cell].roadGO.transform.rotation);
                             //lookCell.tilePossible.Clear();
 
                         }
