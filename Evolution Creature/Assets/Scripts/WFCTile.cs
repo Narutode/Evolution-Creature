@@ -37,7 +37,7 @@ public class WFCTile
                     cellToRemove.Add(p);
             }
             foreach (var p in cellToRemove)
-            {
+            { 
                 if(tilePossible.Count > 1)
                     tilePossible.Remove(p);
             }

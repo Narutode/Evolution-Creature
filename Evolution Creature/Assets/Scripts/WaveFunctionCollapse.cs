@@ -19,7 +19,7 @@ public class WaveFunctionCollapse : MonoBehaviour
     private WFCTile curTile;
 
     public GameObject tileEx;
-    //private List<WFCTile> tileToCheck;
+    private List<WFCTile> tileToCheck;
     //private List<WFCTile> tileToAdd;
 
     //Sauce
@@ -77,41 +77,89 @@ public class WaveFunctionCollapse : MonoBehaviour
     void Update()
     {
         //Créer des modèles de contraintes pour chaque tuile ???
-        
-        while (curTile != null)
-        //foreach (var t in tileToCheck)
-        {
-            //curTile = t;
-            if(curTile.cell == -1)
-                CollapseTileRandom(curTile);
 
-            //Instanciation de la tile
-            if (curTile.cell > 0)
-                Instantiate(availableTiles[curTile.cell].roadGO,
-                    new Vector3(curTile.posX, curTile.posY, curTile.posZ),
-                    availableTiles[curTile.cell].roadGO.transform.rotation);
-            
-            //On cherche la prochaine tile avec la plus petite entropie
-            minP = 12;
-            curTile = null;
-            for (int x = 0; x < sizeX; x++)
+        WFCTile nextTile = null;
+        int nbPoss = 10;
+        for (int x = 0; x < sizeX; x++)
+        {
+            for (int y = 0; y < sizeY; y++)
             {
-                for (int y = 0; y < sizeY; y++)
+                for (int z = 0; z < sizeZ; z++)
                 {
-                    for (int z = 0; z < sizeZ; z++)
+                    if (grid[x, y, z].tilePossible.Count() > 0 && grid[x, y, z].tilePossible.Count() <= nbPoss && grid[x, y, z].cell == -1)
                     {
-                        if (grid[x, y, z].cell == -1 && grid[x, y, z].tilePossible.Count < minP)
-                        {
-                            curTile = grid[x, y, z];
-                            minP = curTile.tilePossible.Count;
-                        }
+                        nbPoss = grid[x, y, z].tilePossible.Count();
+                        nextTile = grid[x, y, z];
                     }
                 }
             }
-            //Debug.Log(minP);
         }
-        //Debug.Log(tileToAdd.Count);
 
+        if (nextTile != null)
+        {
+            if (nextTile.tilePossible.Count() > 1)
+            {
+                int rand = Random.Range(0, nextTile.tilePossible.Count());
+                nextTile.cell = nextTile.tilePossible[rand];
+                nextTile.tilePossible.Clear();
+            } else if(nextTile.tilePossible.Count() == 1)
+            {
+                nextTile.cell = nextTile.tilePossible[0];
+                nextTile.tilePossible.Clear();
+            }
+            else
+            {
+                nextTile.cell = 0;
+            }
+            //CollapseTileRandom(nextTile);
+
+            //Instanciation de la tile
+            if (nextTile.cell > 0)
+            {
+                Instantiate(availableTiles[nextTile.cell].roadGO,
+                    new Vector3(nextTile.posX, nextTile.posY, nextTile.posZ),
+                    availableTiles[nextTile.cell].roadGO.transform.rotation);
+            }
+
+            propagateTile(nextTile);
+        }
+        
+        /*
+    while (tileToCheck.Count() > 0)
+    {
+        curTile = tileToCheck[0];
+        tileToCheck.Remove(curTile);
+        //curTile = t;
+        if(curTile.cell == -1)
+            CollapseTileRandom(curTile);
+
+        //Instanciation de la tile
+        if (curTile.cell > 0)
+            Instantiate(availableTiles[curTile.cell].roadGO,
+                new Vector3(curTile.posX, curTile.posY, curTile.posZ),
+                availableTiles[curTile.cell].roadGO.transform.rotation);
+        
+        //On cherche la prochaine tile avec la plus petite entropie
+        minP = 12;
+        curTile = null;
+        for (int x = 0; x < sizeX; x++)
+        {
+            for (int y = 0; y < sizeY; y++)
+            {
+                for (int z = 0; z < sizeZ; z++)
+                {
+                    if (grid[x, y, z].cell == -1 && grid[x, y, z].tilePossible.Count < minP)
+                    {
+                        curTile = grid[x, y, z];
+                        minP = curTile.tilePossible.Count;
+                    }
+                }
+            }
+        }
+        //Debug.Log(minP);
+    }
+    //Debug.Log(tileToAdd.Count);
+*/
         //tileToCheck.Clear();
         //tileToCheck.AddRange(tileToAdd.ToList());
         //tileToAdd.Clear();
@@ -169,7 +217,8 @@ public class WaveFunctionCollapse : MonoBehaviour
                             for (int c = -sizeNeighborhood; c <= sizeNeighborhood; c++)
                             {
                                 if ((a != 0 || b != 0 || c != 0) && x + a >= 0 && x + a < size && y + b >= 0 &&
-                                    y + b < size && z + c >= 0 && z + c < size)
+                                    y + b < size && z + c >= 0 && z + c < size
+                                    && curRoadTile.contraintes.Length > 0)
                                 {
                                     int cons = exGrid[x + a, y + b, z + c];
                                     if (!curRoadTile.contraintes[a + sizeNeighborhood, b + sizeNeighborhood,
@@ -183,7 +232,7 @@ public class WaveFunctionCollapse : MonoBehaviour
                 }
             }
         }
-/*
+        /*
         RoadTile EmptyTile = availableTiles[0];
         for (int a = -sizeNeighborhood; a <= sizeNeighborhood; a++)
         {
@@ -270,9 +319,9 @@ public class WaveFunctionCollapse : MonoBehaviour
         tile.cell = index;
         tile.tilePossible.Clear();
         
-        propagateTile(tile);
+        //propagateTile(tile);
         
-        Debug.Log(tile.cell);
+        //Debug.Log(tile.cell);
     }
 
     void propagateTile(WFCTile tile)
@@ -283,16 +332,26 @@ public class WaveFunctionCollapse : MonoBehaviour
             {
                 for (int c = -sizeNeighborhood; c <= sizeNeighborhood; c++)
                 {
-                    if ((a != 0 || b != 0 || c != 0) && curTile.posX + a >= 0 && curTile.posX + a < sizeX &&
-                        curTile.posY + b >= 0 &&
-                        curTile.posY + b < sizeY && curTile.posZ + c >= 0 && curTile.posZ + c < sizeZ)
+                    if ((a != 0 || b != 0 || c != 0) && tile.posX + a >= 0 && tile.posX + a < sizeX &&
+                        tile.posY + b >= 0 &&
+                        tile.posY + b < sizeY && tile.posZ + c >= 0 && tile.posZ + c < sizeZ
+                        && tile.cell != -1)
                     {
-                        var lookCell = grid[curTile.posX + a, curTile.posY + b, curTile.posZ + c];
-                        lookCell.Update(availableTiles[curTile.cell].contraintes[a + sizeNeighborhood,
+                        var lookCell = grid[tile.posX + a, tile.posY + b, tile.posZ + c];
+                        lookCell.Update(availableTiles[tile.cell].contraintes[a + sizeNeighborhood,
                             b + sizeNeighborhood, c + sizeNeighborhood]);
                         if (lookCell.tilePossible.Count == 1)
-                            CollapseTile(lookCell);
+                        {
+                            //lookCell.cell = lookCell.tilePossible[0];
+                            Debug.Log("lookCell.cell: " + lookCell.cell);
 
+                            propagateTile(lookCell);
+                            Instantiate(availableTiles[lookCell.cell].roadGO,
+                                new Vector3(lookCell.posX, lookCell.posY, lookCell.posZ),
+                                availableTiles[lookCell.cell].roadGO.transform.rotation);
+                            //lookCell.tilePossible.Clear();
+
+                        }
                     }
                 }
             }
