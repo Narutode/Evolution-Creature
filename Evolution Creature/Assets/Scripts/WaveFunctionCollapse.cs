@@ -9,10 +9,10 @@ public class WaveFunctionCollapse : MonoBehaviour
 
     public GameObject cube;
 
-    private int sizeX = 20, sizeY = 20, sizeZ = 20;
+    private int sizeX = 40, sizeY = 2, sizeZ = 40;
 
     //private int curX, curY;
-    public int sizeNeighborhood = 2;
+    public int sizeNeighborhood = 1;
 
     public List<RoadTile> availableTiles;
     private int minP = 12;
@@ -78,7 +78,7 @@ public class WaveFunctionCollapse : MonoBehaviour
     {
         //Créer des modèles de contraintes pour chaque tuile ???
         
-        if (curTile != null)
+        while (curTile != null)
         //foreach (var t in tileToCheck)
         {
             //curTile = t;
